@@ -24,18 +24,20 @@ public class UserController {
         this.repo = repo;
     }
 
-    //handle a GET request for /users by returning all rows
+    //handle a GET request at the controllers base path
     @GetMapping
-    public List<User> getAll(){
+    public List<User> getAllUsers(){
         return repo.findAll();
     }
+
+    //handle a GET request at the /id
 
     //handle a POST request to /users
     // -deserialize the incoming JSON (@RequestBody)
     // -insert the user into the database
     // -return the saved user (serialized)
     @PostMapping
-    public User create(@RequestBody User user){
+    public User createUser(@RequestBody User user){
         return repo.save(user);
     }
 
