@@ -2,23 +2,19 @@ package michael.PunchLiteDemo.service;
 
 import java.util.List;
 
+
+import org.springframework.stereotype.Service;
+
 import michael.PunchLiteDemo.model.User;
 import michael.PunchLiteDemo.repository.UserRepository;
 
+@Service
 public class UserService {
-    
-    private final UserRepository userRepo;
 
+    private final UserRepository userRepo;
+    
     public UserService(UserRepository userRepo){
         this.userRepo = userRepo;
-    }
-
-    public User createUser(User user){
-        //see if the user already exists
-        if(userRepo.existsById(user.getId()) || userRepo.existsByUsername(user.getUsername())){
-            throw new IllegalStateException("Error: User already exists");
-        }
-        return this.userRepo.save(user);
     }
 
     public User getUserById(Long id){

@@ -35,12 +35,6 @@ public class UserController {
         return this.userService.listUsers();
     }
 
-    //POST /api/users
-    @PostMapping("")
-    public User createUser(@RequestBody User user){
-        return this.userService.createUser(user);
-    }
-
     //POST /api/users/id
     @PostMapping("/{id}")
     public User updateUser(@PathVariable("id") Long userId, @RequestBody User updateInfo){
