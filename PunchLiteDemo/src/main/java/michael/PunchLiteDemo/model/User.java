@@ -6,21 +6,23 @@ import jakarta.persistence.*;
 /**
  * Define a user data structure
  */
-
-
 @Entity
+@Table(name = "users")
 public class User {
 
     //Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     
     //attributes
     private String username;
     private String email;
     private String role;
     private float hourlyRate;
+
+    //no arg constructor
+    public User(){}
 
     //Create getters and setters for each attribute
     public Long getId() {return id;}

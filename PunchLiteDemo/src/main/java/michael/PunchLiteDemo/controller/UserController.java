@@ -1,44 +1,62 @@
 package michael.PunchLiteDemo.controller;
 
 import michael.PunchLiteDemo.model.User;
-import michael.PunchLiteDemo.repository.UserRepository;
+import michael.PunchLiteDemo.service.UserService;
 
 import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
 /** 
- * Define Logic to interact with the User database
- * JPA simplifies SQL queries
+ * UserController interacts with UserService to
+ * Expose the REST API for User CRUD operations
+ * 
+ * - Create Users
+ * - Delete Users
+ * - Modify Users
 */
 
 @RestController //This class converts HTTP requests to serialized JSONs
-@RequestMapping("/users") //all HTTP endpoints that this covers are under /users
+@RequestMapping("/api/users") //all HTTP endpoints that this covers are under /api/users endpoints
 public class UserController {
     
-    //set db connection in the contructor
-    private final UserRepository repo;
+    //save the service layer
+    private final UserService userService;
 
-    public UserController(UserRepository repo){
+    public UserController(UserService userService){
 
-        this.repo = repo;
+        this.userService = userService;
     }
 
-    //handle a GET request at the controllers base path
-    @GetMapping
+    //-------EXPOSES REST API HERE-----
+    //GET /api/users
+    @GetMapping("")
     public List<User> getAllUsers(){
-        return repo.findAll();
+        return this.userService.listUsers();
     }
 
-    //handle a GET request at the /id
-
-    //handle a POST request to /users
-    // -deserialize the incoming JSON (@RequestBody)
-    // -insert the user into the database
-    // -return the saved user (serialized)
-    @PostMapping
+    //POST /api/users
+    @PostMapping("")
     public User createUser(@RequestBody User user){
-        return repo.save(user);
+        return this.userService.createUser(user);
+    }
+
+    //POST /api/users/id
+    @PostMapping("/{id}")
+    public User updateUser(@PathVariable("id") Long userId, @RequestBody User updateInfo){
+        return this.userService.updateUser(userId, updateInfo);
+    }
+
+    //DELETE /api/users/id
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable("id") Long userId){
+        this.userService.deleteUser(userId);
+    } 
+
+    //POST /api/user/id
+    @PostMapping("/{id}")
+    public User getUserById(@PathVariable("id") Long userId){
+        return this.userService.getUserById(userId);
     }
 
 }

@@ -1,23 +1,37 @@
 package michael.PunchLiteDemo.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.Id;
-
+//use jakarta imports for JPA
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 
-public class TimeEntry {
+@Entity
+public class TimeEntry implements Serializable {
     
     //primary key
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //attributes
+    //annotate object references to define foreign key relationship
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
+
+    //non key attributes
     private LocalDateTime clockIn;
     private LocalDateTime clockOut;
-    private float durationHr;
+    private Double durationHr;
     
+    //no arg constructor
+    public TimeEntry(){}
+
     //getter and setters
     public Long getId(){return id;}
     public void setId(Long id){this.id = id;}
@@ -31,7 +45,7 @@ public class TimeEntry {
     public LocalDateTime getClockOut(){return clockOut;}
     public void setClockOut(LocalDateTime clockOut){this.clockOut = clockOut;}
     
-    public float getDurationHr(){return durationHr;}
-    public void setDurationHr(float durationHr){this.durationHr = durationHr;}
+    public Double getDurationHr(){return durationHr;}
+    public void setDurationHr(Double durationHr){this.durationHr = durationHr;}
     
 }

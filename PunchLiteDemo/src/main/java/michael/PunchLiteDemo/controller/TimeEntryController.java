@@ -1,43 +1,49 @@
 package michael.PunchLiteDemo.controller;
 
-import java.time.LocalDateTime;
+
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import michael.PunchLiteDemo.model.TimeEntry;
-import michael.PunchLiteDemo.repository.TimeEntryRepository;
+import michael.PunchLiteDemo.service.TimeEntryService;
 
+
+
+/**
+ * 
+ * 
+ */
 @RestController
-@RequestMapping("/api/time-entry")
+@RequestMapping("/api/time-entries")
 public class TimeEntryController {
     
-    private TimeEntryRepository repo;
+    private final TimeEntryService timeEntryService;
 
-    public TimeEntryController(TimeEntryRepository repo){
-        this.repo = repo;
+    public TimeEntryController(TimeEntryService timeEntryService){
+        this.timeEntryService = timeEntryService;
     }
 
     //REST API here
-    @GetMapping
-    public List<TimeEntry> getAllTimeEntries(){
-        return this.repo.findAll();
+    @GetMapping("/employees/{id}/time-entries")
+    public ResponseEntity<List<TimeEntry>> getTimeEntriesByEmployee(@PathVariable("id") Long userId){
+        return ResponseEntity.ok(this.timeEntryService.getTimeEntriesByUser(userId));
     }
 
-    @PostMapping
-    public TimeEntry clockIn(@RequestBody TimeEntry entry){
-        entry.setClockIn(LocalDateTime.now());
-        return repo.save(entry);
+
+    @PostMapping("/employees/{id}/clock-in")
+    public TimeEntry clockIn(@PathVariable("id") Long userId){
+        return this.timeEntryService.handleClockIn(userId);
     }
 
-    @PostMapping
-    public TimeEntry clockOut(@RequestBody TimeEntry entry){
-        entry.setClockOut(LocalDateTime.now());
-        return repo.save(entry);
+    @PostMapping("/employees/{id}/clock-out")
+    public TimeEntry clockOut(@PathVariable("id") Long userId){
+        return this.timeEntryService.handleClockOut(userId);
     }  
 
 

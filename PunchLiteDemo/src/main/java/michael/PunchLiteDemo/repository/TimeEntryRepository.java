@@ -7,9 +7,9 @@ import michael.PunchLiteDemo.model.TimeEntry;
 import michael.PunchLiteDemo.model.User;
 
 public interface TimeEntryRepository extends JpaRepository<TimeEntry, Long>{
-    List<TimeEntry> findByEmployeeId(Long employeeID);
+    List<TimeEntry> findByUserId(Long userId);
     List<TimeEntry> findByClockInAfterAndUser(LocalDateTime clockIn, User user);
     List<TimeEntry> findByClockInBetweenAndUser(LocalDateTime start, LocalDateTime end, User user);
-    
+    TimeEntry findTopByUserIdOrderByClockInDesc(Long userId);
 }
 
