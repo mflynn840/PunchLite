@@ -1,10 +1,9 @@
 package michael.PunchLiteDemo.service;
 
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import io.jsonwebtoken.InvalidClaimException;
+
 import michael.PunchLiteDemo.dto.JwtResponse;
 import michael.PunchLiteDemo.dto.LoginRequest;
 import michael.PunchLiteDemo.dto.RegisterRequest;

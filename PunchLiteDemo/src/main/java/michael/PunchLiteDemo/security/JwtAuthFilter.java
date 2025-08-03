@@ -4,8 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import michael.PunchLiteDemo.model.User;
-import michael.PunchLiteDemo.repository.UserRepository;
+
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,12 +36,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
         throws ServletException, IOException {
 
+        //do not filter public endpoints
+        if (request.getRequestURI().startsWith("/api/auth/") || "OPTIONS".equalsIgnoreCase(request.getMethod())){
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         //get the authorization header from the request
         final String authHeader = request.getHeader("Authorization");
 
-        //no bearer token means go through rest of filter chain
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+        //no bearer token means go through normal filter chain
+        if ( authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response); 
+            return;
         }
 
         try{
