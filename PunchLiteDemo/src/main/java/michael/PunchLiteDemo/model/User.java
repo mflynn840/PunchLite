@@ -26,13 +26,18 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String role;
-    private float hourlyRate;
+    private Double hourlyRate;
     
 
-    //no arg constructor
+    //Constructors
     public User(){}
 
-    //Create getters and setters for each attribute
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    //Getters and setters
     public Long getId() {return this.id;}
     protected void setId(Long id){this.id = id;}
 
@@ -45,12 +50,13 @@ public class User implements UserDetails {
     public String getRole(){return this.role;}
     public void setRole(String role){this.role = role;}
 
-    public float getHourlyRate(){return this.hourlyRate;}
-    public void setHourlyRate(float hourlyRate){this.hourlyRate = hourlyRate;}
+    public Double getHourlyRate(){return this.hourlyRate;}
+    public void setHourlyRate(Double hourlyRate){this.hourlyRate = hourlyRate;}
 
     public String getPassword(){return this.password;}
     public void setPassword(String password){this.password = password;}
 
+    //return a list of the users privledges
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

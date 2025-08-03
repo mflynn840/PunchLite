@@ -1,20 +1,27 @@
 package michael.PunchLiteDemo.service;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import io.jsonwebtoken.InvalidClaimException;
 import michael.PunchLiteDemo.dto.JwtResponse;
 import michael.PunchLiteDemo.dto.LoginRequest;
 import michael.PunchLiteDemo.dto.RegisterRequest;
+import michael.PunchLiteDemo.exception.InvalidCredentialsException;
+import michael.PunchLiteDemo.exception.UserAlreadyExistsException;
 import michael.PunchLiteDemo.model.User;
 import michael.PunchLiteDemo.repository.UserRepository;
 import michael.PunchLiteDemo.security.JwtUtil;
+
 @Service
 public class AuthService {
 
     private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+
+
     public AuthService(UserRepository userRepo, PasswordEncoder passwordEncoder, JwtUtil jwtUtil){
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
@@ -23,14 +30,14 @@ public class AuthService {
 
     public void registerUser(RegisterRequest newUserRequest){
 
+        //Throw exception when user already exists
+        if(userRepo.existsByUsername(newUserRequest.getUsername())){
+            throw new UserAlreadyExistsException("Username already taken");
+        }
+
         String username = newUserRequest.getUsername();
         String rawPassword = newUserRequest.getPassword();
         String email = newUserRequest.getEmail();
-
-        //see if the user already exists
-        if(userRepo.existsByUsername(username)){
-            throw new IllegalStateException("Error: User already exists");
-        }
 
         User newUser = new User();
         newUser.setUsername(username);
@@ -44,14 +51,12 @@ public class AuthService {
         String username = loginRequest.getUsername();
         String rawPassword = loginRequest.getPassword();
 
-        User user = this.userRepo.findByUsername(username);
-        if(user == null){
-            throw new IllegalStateException("Error: user does not exist");
-        }
+        User user = this.userRepo.findByUsername(username)
+                        .orElseThrow(() -> new InvalidCredentialsException("Invalid username or password"));
         
         //authenticate correct password using bCrypt
         if(!passwordEncoder.matches(rawPassword, user.getPassword())){
-            throw new IllegalArgumentException("Error: incorrect password");
+            throw new InvalidCredentialsException("Invalid username or password");
         }
 
         //generate and return users JWT authentication token (1day)

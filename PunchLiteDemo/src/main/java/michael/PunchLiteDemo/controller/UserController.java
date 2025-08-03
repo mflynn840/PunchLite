@@ -1,5 +1,6 @@
 package michael.PunchLiteDemo.controller;
 
+import michael.PunchLiteDemo.dto.UserUpdateRequest;
 import michael.PunchLiteDemo.model.User;
 import michael.PunchLiteDemo.service.UserService;
 
@@ -35,9 +36,9 @@ public class UserController {
         return this.userService.listUsers();
     }
 
-    //POST /api/users/id
-    @PostMapping("/{id}")
-    public User updateUser(@PathVariable("id") Long userId, @RequestBody User updateInfo){
+    //PUT /api/users/id
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable("id") Long userId, @RequestBody UserUpdateRequest updateInfo){
         return this.userService.updateUser(userId, updateInfo);
     }
 
@@ -47,8 +48,8 @@ public class UserController {
         this.userService.deleteUser(userId);
     } 
 
-    //POST /api/user/id
-    @PostMapping("/{id}")
+    //GET /api/user/id
+    @GetMapping("/{id}")
     public User getUserById(@PathVariable("id") Long userId){
         return this.userService.getUserById(userId);
     }
