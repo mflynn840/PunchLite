@@ -1,25 +1,31 @@
 
 //import react and the useState hook
 import React, { useState } from 'react';
-import '../styles/Register.css'
+import '../styles/Login.css'
+
+//use react router to switch between pages
 import { useNavigate } from 'react-router-dom'; 
+
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 // Create a component that displays user registration form
-function Register() {
-    //initilize an empty form and store the values in the json format
-    const [formData, setFormData] = useState({
-        username: '',
-        email: '',
-        password: '',
-        role: '',
-    });
+function Login() {
 
     const navigate = useNavigate();
 
-    const goToLogin = (e) => {
-      navigate("/login");
+    //handler for switching to the register page
+    const goToRegister = () => {
+      navigate("/register");
     };
+
+
+    //initilize an empty form and store the values in the json format
+    const [formData, setFormData] = useState({
+        username: '',
+        password: '',
+    });
+
+
     // Create a state to hold the success or error message from backend
     const [status, setStatus] = useState(null); 
 
@@ -41,24 +47,21 @@ function Register() {
 
         //try sending a POST request to the backend
         try {
-            const res = await fetch(`${API_BASE}/api/auth/register`, {
+            const res = await fetch(`${API_BASE}/api/auth/login`, {
                 method: 'POST',  //HTTP send method
                 headers: {'Content-Type': 'application/json'}, //Tell backend we are sending a json
                 body: JSON.stringify(formData), //convert form data to a json and use as body
             });
 
             //If an error occurs when registering
-            if (!res.ok) throw new Error('Registration failed');
+            if (!res.ok) throw new Error('Login failed');
 
-            setStatus('User registration succesful');
-
+            setStatus('Login Succesful');
 
             // Clear the form after a succesful registration
             setFormData({
                 username: '',
-                email: '',
                 password: '',
-                role: '',
             });
         //if a JS error occurs print it
         }catch (err){
@@ -71,9 +74,9 @@ function Register() {
     // Render the form on the page
     return (
       <div className="register-container" style={{ maxWidth: '400px', margin: '2rem auto' }}>
-        <h2 className="register-title">Register</h2>
+        <h2 className="login-title">Login</h2>
 
-        <form onSubmit={handleSubmit} className="register-form">
+        <form onSubmit={handleSubmit} className="login-form">
 
           <input
             name="username"
@@ -81,20 +84,10 @@ function Register() {
             value={formData.username}
             onChange={handleInput}
             required
-            className="register-input"
+            className="login-input"
           />
           <br />
 
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleInput}
-            required
-            className="register-input"
-          />
-          <br />
 
           <input
             name="password"
@@ -103,27 +96,18 @@ function Register() {
             value={formData.password}
             onChange={handleInput}
             required
-            className="register-input"
+            className="login-input"
           />
           <br />
 
-          <input
-            name="role"
-            placeholder="Role (optional)"
-            value={formData.role}
-            onChange={handleInput}
-            className="register-input"
-          />
-          <br />
-
-          <button type="submit" className="register-button">Register</button>
-          <button type="button" className="register-button" onClick={goToLogin}>Login</button>
+          <button type="submit" className="login-button">Login</button>
+          <button type="button" className="login-button" onClick={goToRegister}>Register Account</button>
         </form>
 
-        {status && <p className="register-status">{status}</p>}
+        {status && <p className="login-status">{status}</p>}
       </div>
     );
 
 }
 
-export default Register;
+export default Login;
