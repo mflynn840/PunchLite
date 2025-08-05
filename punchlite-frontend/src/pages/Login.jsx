@@ -1,6 +1,7 @@
 
 //import react and the useState hook
 import React, { useState } from 'react';
+
 import '../styles/Login.css'
 
 //use react router to switch between pages
@@ -47,22 +48,31 @@ function Login() {
 
         //try sending a POST request to the backend
         try {
-            const res = await fetch(`${API_BASE}/api/auth/login`, {
+            const response = await fetch(`${API_BASE}/api/auth/login`, {
                 method: 'POST',  //HTTP send method
                 headers: {'Content-Type': 'application/json'}, //Tell backend we are sending a json
                 body: JSON.stringify(formData), //convert form data to a json and use as body
             });
 
             //If an error occurs when registering
-            if (!res.ok) throw new Error('Login failed');
+            if (!response.ok) throw new Error('Login failed');
 
+            const responseDat = await response.json();
+            //store the returned JWT token to get access to the dashboard
+            localStorage.setItem("token", responseDat.token);
+            localStorage.setItem("user", JSON.stringify(responseDat.user))
             setStatus('Login Succesful');
+
+            //Go to the users dashboard
+            navigate(`/user/${responseDat.user.username}`)
 
             // Clear the form after a succesful registration
             setFormData({
                 username: '',
                 password: '',
             });
+
+            
         //if a JS error occurs print it
         }catch (err){
             setStatus(`ERROR: ${err.message}`);

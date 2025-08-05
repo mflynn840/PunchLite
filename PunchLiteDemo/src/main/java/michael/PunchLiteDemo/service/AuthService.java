@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import michael.PunchLiteDemo.dto.JwtResponse;
 import michael.PunchLiteDemo.dto.LoginRequest;
 import michael.PunchLiteDemo.dto.RegisterRequest;
+import michael.PunchLiteDemo.dto.UserDto;
 import michael.PunchLiteDemo.exception.InvalidCredentialsException;
 import michael.PunchLiteDemo.exception.UserAlreadyExistsException;
 import michael.PunchLiteDemo.model.User;
@@ -61,6 +62,7 @@ public class AuthService {
         //generate and return users JWT authentication token (1day)
 
         String token = this.jwtUtil.generateToken(username);
-        return new JwtResponse(token);
+        UserDto uDto = new UserDto(user);
+        return new JwtResponse(token, uDto);
     }
 }
