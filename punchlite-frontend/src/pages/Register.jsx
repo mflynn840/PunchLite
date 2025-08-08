@@ -107,13 +107,18 @@ function Register() {
           />
           <br />
 
-          <input
+          <select
             name="role"
-            placeholder="Role (optional)"
+            placeholder="Role"
             value={formData.role}
             onChange={handleInput}
             className="register-input"
-          />
+          >
+            <option value="" disabled> Select role </option>
+            <option value="EMPLOYEE">Employee</option>
+            <option value="MANAGER">Manager</option>
+
+          </select>
           <br />
 
           <button type="submit" className="register-button">Register</button>

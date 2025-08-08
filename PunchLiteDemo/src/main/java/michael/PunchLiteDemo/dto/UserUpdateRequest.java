@@ -1,17 +1,19 @@
 package michael.PunchLiteDemo.dto;
 
+import michael.PunchLiteDemo.model.Role;
+
 public class UserUpdateRequest {
     
     private String username;
     private String email;
-    private String role;
+    private Role role;
     private Double hourlyRate;  // Use wrapper Double to allow null
 
     // No-arg constructor
     public UserUpdateRequest() {}
 
     // All-args constructor (optional)
-    public UserUpdateRequest(String username, String email, String role, Double hourlyRate) {
+    public UserUpdateRequest(String username, String email, Role role, Double hourlyRate) {
         this.username = username;
         this.email = email;
         this.role = role;
@@ -36,11 +38,11 @@ public class UserUpdateRequest {
         this.email = email;
     }
 
-    public String getRole() {
-        return role;
+    public Role getRole() {
+        return this.role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

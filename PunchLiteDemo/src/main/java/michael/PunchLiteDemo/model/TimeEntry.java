@@ -28,6 +28,8 @@ public class TimeEntry implements Serializable {
     private LocalDateTime clockIn;
     private LocalDateTime clockOut;
     private Double durationHr;
+
+    private Boolean isValidated = false;
     
     //no arg constructor
     public TimeEntry(){}
@@ -47,5 +49,8 @@ public class TimeEntry implements Serializable {
     
     public Double getDurationHr(){return durationHr;}
     public void setDurationHr(Double durationHr){this.durationHr = durationHr;}
+
+    public void setIsValidated(Boolean isValidated) {this.isValidated = isValidated;}
+    public Boolean getIsValidated() {return isValidated;}
     
 }

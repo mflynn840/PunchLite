@@ -10,6 +10,7 @@ import michael.PunchLiteDemo.dto.RegisterRequest;
 import michael.PunchLiteDemo.dto.UserDto;
 import michael.PunchLiteDemo.exception.InvalidCredentialsException;
 import michael.PunchLiteDemo.exception.UserAlreadyExistsException;
+import michael.PunchLiteDemo.model.Role;
 import michael.PunchLiteDemo.model.User;
 import michael.PunchLiteDemo.repository.UserRepository;
 import michael.PunchLiteDemo.security.JwtUtil;
@@ -38,11 +39,14 @@ public class AuthService {
         String username = newUserRequest.getUsername();
         String rawPassword = newUserRequest.getPassword();
         String email = newUserRequest.getEmail();
+        Role role = newUserRequest.getRole();
 
         User newUser = new User();
         newUser.setUsername(username);
         newUser.setPassword(this.passwordEncoder.encode(rawPassword));
         newUser.setEmail(email);
+        newUser.setRole(role);
+
         this.userRepo.save(newUser);
     }
 

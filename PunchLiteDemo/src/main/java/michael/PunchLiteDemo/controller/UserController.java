@@ -1,5 +1,6 @@
 package michael.PunchLiteDemo.controller;
 
+import michael.PunchLiteDemo.dto.TimeEntryDto;
 import michael.PunchLiteDemo.dto.UserDto;
 import michael.PunchLiteDemo.dto.UserUpdateRequest;
 import michael.PunchLiteDemo.model.User;
@@ -35,8 +36,22 @@ public class UserController {
     //-------EXPOSES REST API HERE-----
     //GET /api/users
     @GetMapping("")
-    public ResponseEntity<List<User>> getAllUsers(){
-        return ResponseEntity.ok(this.userService.listUsers());
+    public ResponseEntity<List<UserDto>> getAllUsers(){
+        List<User> allUsers = this.userService.listUsers();
+        List<UserDto> dtos = allUsers.stream()
+                                        .map(UserDto::new)
+                                        .toList();
+        return ResponseEntity.ok(dtos);
+    }
+
+    //GET /api/users/managed-by/manager-id
+    @GetMapping("/managed-by/{username}")
+    public ResponseEntity<List<UserDto>> getUsersManagedBy(@PathVariable("username") String managerUsername){
+        List<User> users = this.userService.listUsersManagedBy(managerUsername);
+        List<UserDto> dtos = users.stream()
+                                        .map(UserDto::new)
+                                        .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     //PUT /api/users/id
@@ -56,7 +71,7 @@ public class UserController {
     @GetMapping("/clock-status/{username}")
     public ResponseEntity<Map<String,Boolean>> isClockedIn(@PathVariable("username") String username){
         Boolean clockedIn = this.userService.isClockedIn(username);
-        //Add it to a JSON
+        //map it to a JSON
         Map<String, Boolean> response = Map.of("clockedIn", clockedIn);
         return ResponseEntity.ok(response);
     }

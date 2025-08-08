@@ -4,9 +4,11 @@ package michael.PunchLiteDemo.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,5 +61,18 @@ public class TimeEntryController {
         return ResponseEntity.ok(new TimeEntryDto(res));
     }  
 
+    /**
+     * Validate a time entry
+     * - Only the correct manager can validate time entries
+     * - The time entry must have a clock in and clock out time
+     * - The time entry being modified is being delivered as JSON in the request body
+     */
+    @PreAuthorize("hasRole('MANAGER')")
+    @PostMapping("/managers/{id}/validate")
+    public ResponseEntity<TimeEntryDto> validateTimeEntry(@PathVariable("id") Long managerId, @RequestBody TimeEntryDto timeEntry){
+
+        TimeEntry validated = this.timeEntryService.validateTimeEntry(managerId, timeEntry);
+        return ResponseEntity.ok(new TimeEntryDto(validated));
+    }
 
 }

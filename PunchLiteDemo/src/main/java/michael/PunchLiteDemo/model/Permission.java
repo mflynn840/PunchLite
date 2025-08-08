@@ -1,0 +1,12 @@
+package michael.PunchLiteDemo.model;
+
+public enum Permission {
+    READ_SELF,
+    READ_ALL_EMPLOYEES,
+    EDIT_EMPLOYEE_TIMECARDS,
+    EDIT_ALL_TIMECARDS,
+    VALIDATE_TIMECARDS,
+    VALIDATE_ALL_TIMECARDS,
+    SET_EMPLOYEE_WAGES,
+    SET_ALL_WAGES
+}

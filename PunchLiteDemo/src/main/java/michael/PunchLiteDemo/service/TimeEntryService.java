@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import michael.PunchLiteDemo.repository.TimeEntryRepository;
 import michael.PunchLiteDemo.repository.UserRepository;
+import michael.PunchLiteDemo.dto.TimeEntryDto;
 import michael.PunchLiteDemo.model.TimeEntry;
 import michael.PunchLiteDemo.model.User;
 
@@ -63,6 +64,29 @@ public class TimeEntryService {
         double durationHours = java.time.Duration.between(clockIn, clockOut).toMinutes()/60.0;
         latestEntry.setDurationHr(durationHours);
         return this.timeEntryRepo.save(latestEntry);
+        
+    }
+
+    public TimeEntry validateTimeEntry(Long managerId, TimeEntryDto timeEntryDto){ 
+
+        //if requesting manager is not the manager of the user
+        if(this.userRepo.existsByIdAndManagerId(timeEntryDto.getUserId(), managerId) == false){
+            throw new IllegalStateException("Error: Manager is not authorized to validate this time entry");
+        }
+
+        //if the time entry does not have a clock in or clock out time
+        if(timeEntryDto.getClockIn() == null || timeEntryDto.getClockOut() == null){
+            throw new IllegalStateException("Error: Time entry must have a clock in and clock out time");
+        }
+
+
+        //validate that the entry and  return it
+        TimeEntry entry = this.timeEntryRepo.findById(timeEntryDto.getId())
+            .orElseThrow(() -> new IllegalArgumentException("Time entry not found"));
+        entry.setIsValidated(true);
+
+        return entry;
+
         
     }
 }

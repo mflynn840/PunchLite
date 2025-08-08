@@ -1,13 +1,19 @@
 import {useState} from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {useParams} from "react-router-dom";
-import logoImg from '../assets/logo.png'
-import Clock from '../components/Clock';
 
+//import hooks (handlers)
 import {useClockInStatus} from "../hooks/useClockInStatus";
-import {ClockInStatus} from "../components/ClockInStatus";
-import TimeEntryTable from "../components/TimeEntryTable";
+import {useClockPunch} from "../hooks/useClockPunch";
+import {useLogout} from "../hooks/useLogout";
+
+//import components (views)
+import Sidebar from "../components/Sidebar";
+import ClockScreen from "../components/ClockScreen";
 import ViewPay from "./ViewPay";
+import ManageEmployees from "./ManageEmployees"
+
+//import the backends ip address
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 
@@ -15,121 +21,69 @@ export default function Dashboard() {
 
   //get username from the url
   const {username} = useParams();
+
+  //triggered when user clocks in or out
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  //listening value for clock in status
   const isClockedIn = useClockInStatus(username, refreshTrigger);
-  const [activePage, setActivePage] = useState('dashboard');
 
+  //manage a changing sub-view
+  const [activePage, setActivePage] = useState('punch');
 
-  const handleClockIn = async(e) => {
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  //import hooks
+  const {handleClockIn, handleClockOut} = useClockPunch(username, setRefreshTrigger, setActivePage);
+  const logout = useLogout();
 
-
-    e.preventDefault(); //prevent the page from reloading
-    
-    //try sending a POST request to the backend to clock in
-    try{
-      const response = await fetch(`${API_BASE}/api/time-entries/employees/${username}/clock-in`,
-      {
-        method: "POST",
-        headers : {
-          "Authorization" : `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json"
-        }
-      });
-
-      //handle backend returning errors
-      if(!response.ok) throw new Error("Failed to clock in");
-
-      //go back to main dashboard
-      setActivePage('dashboard');
-      //trigger the hook to update the displayed clock in status
-      setRefreshTrigger(prev => prev+1);
-
-    }catch(error){
-      console.error("Failed to clock in", error.message);
-    }
-  };
-
-  const handleClockOut = async(e) => {
-    e.preventDefault(); //prevent the page from reloading
-    
-    //try sending a POST request to the backend to clock out
-    try{
-      const response = await fetch(`${API_BASE}/api/time-entries/employees/${username}/clock-out`,
-      {
-        method: "POST",
-        headers : {
-          "Authorization" : `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json"
-        }
-      });
-      if (!response.ok) throw new Error("Error: failed to clock out");
-
-      //go back to main dashboard
-      setActivePage('dashboard');
-
-      //update clock in status and time entry table
-      setRefreshTrigger(prev => prev+1);
-
-
-    }catch(error){
-      console.error("Failed to clock out", error.message);
-    }
-  };
-  
 
   return (
     <div className="d-flex flex-column vh-100">
+
       {/* Top Navigation Bar */}
       <header className="bg-secondary text-white px-4 py-2">
-        <h5 className="mb-0">PunchLite User Dashboard</h5>
+        <h5 className="mb-0">User Dashboard</h5>
       </header>
 
       {/* Main content area */}
       <div className="d-flex flex-grow-1">
 
         {/* Sidebar */}
-        <aside className="bg-primary text-white p-3" style={{ width: "250px" }}>
-          {/* Logo */}
-          <div className="text-center mb-4">
-            <img
-              src={logoImg}
-              alt="Logo Image"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-
-          {/* Navigation Buttons */}
-          <div className="d-grid gap-2">
-            <button className="btn btn-outline-light" onClick={handleClockIn}>Clock In</button>
-            <button className="btn btn-outline-light" onClick={handleClockOut}>Clock Out</button>
-            <button className="btn btn-outline-light" onClick={() => setActivePage('pay')}>View Pay</button>
-            <button className="btn btn-outline-light">Logout</button>
-          </div>
-        </aside>
-
+        <Sidebar
+          onClockIn={handleClockIn}
+          onClockOut={handleClockOut}
+          onViewPay={() => setActivePage("pay")}
+          onLogout={logout}
+          onManageEmployees={() => setActivePage("manage-employees")}
+          role = {storedUser?.role}
+        />
 
         {/* Page Content */}
         <main className="flex-grow-1 p-5">
 
           {/* Show clock in/clock out dashboard */}
-          {activePage === 'dashboard' && (
-            <>
-              <h3>Welcome, {username}</h3>
-              <p className="lead">This is your time clock dashboard. Use the menu to manage your hours.</p>
-              <Clock />
-              <div className="mt-4">
-                <ClockInStatus isClockedIn={isClockedIn} />
-              </div>
-              <div className="mt-4">
-                <TimeEntryTable username={username} refreshTrigger={refreshTrigger} />
-              </div>
-            </>
+          {activePage === 'punch' && (
+            <ClockScreen
+              username = {username}
+              isClockedIn={isClockedIn}
+              refreshTrigger={refreshTrigger}
+            />
           )}
+
           {/* show pay information dashboard */}
           {activePage === 'pay' && (
-            <div style = {{flexGrow: 1}}>
-              <ViewPay username={username} refreshTrigger={refreshTrigger} />
-            </div>
+            <ViewPay
+              username={username}
+              refreshTrigger={refreshTrigger} 
+            />
+          )}
+
+          {/* show manage employees dashboard */}
+          {activePage === 'manage-employees' && (
+            <ManageEmployees
+              username={username}
+              refreshTrigger={refreshTrigger}
+            />
           )}
         </main>
       </div>

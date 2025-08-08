@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.*;
-
 
 /**
  * Define a user data structure
@@ -25,9 +25,18 @@ public class User implements UserDetails {
     private String username;
     private String email;
     private String password;
-    private String role;
     private Double hourlyRate;
     
+    @Enumerated(EnumType.STRING)
+    private Role role; 
+
+    //Relationship between employees and managers
+    @OneToMany(mappedBy = "manager")
+    private List<User> subordinates;
+
+    @ManyToOne
+    @JoinColumn(name = "manager_id")
+    private User manager;
 
     //Constructors
     public User(){}
@@ -47,8 +56,8 @@ public class User implements UserDetails {
     public String getEmail(){return this.email;}
     public void setEmail(String email){this.email = email;}
 
-    public String getRole(){return this.role;}
-    public void setRole(String role){this.role = role;}
+    public Role getRole(){return this.role;}
+    public void setRole(Role role){this.role = role;}
 
     public Double getHourlyRate(){return this.hourlyRate;}
     public void setHourlyRate(Double hourlyRate){this.hourlyRate = hourlyRate;}
@@ -59,6 +68,6 @@ public class User implements UserDetails {
     //return a list of the users privledges
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 }

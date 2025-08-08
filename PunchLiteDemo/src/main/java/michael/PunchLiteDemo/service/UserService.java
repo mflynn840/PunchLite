@@ -64,4 +64,11 @@ public class UserService {
         //the employees is clocked in but didnt clock out on their most recent punch
         return latestEntry != null && latestEntry.getClockOut() == null;
     }
+
+    public List<User> listUsersManagedBy(String managerUsername) {
+
+        List<User> managedUsers = this.userRepo.findByManagerUsername(managerUsername)
+                                    .orElseThrow(() -> new IllegalStateException("No users managed"));
+        return managedUsers;
+    }
 }

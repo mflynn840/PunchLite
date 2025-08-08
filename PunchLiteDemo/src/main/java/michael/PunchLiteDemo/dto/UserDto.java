@@ -1,12 +1,12 @@
 package michael.PunchLiteDemo.dto;
 
-
+import michael.PunchLiteDemo.model.Role;
 import michael.PunchLiteDemo.model.User;
 
 public class UserDto {
     private Long id;
     private String username;
-    private String role;
+    private Role role;
 
     public UserDto(User u){
         setId(u.getId());
@@ -35,12 +35,12 @@ public class UserDto {
 
 
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 }
