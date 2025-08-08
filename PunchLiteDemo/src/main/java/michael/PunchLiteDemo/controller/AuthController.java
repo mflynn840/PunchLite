@@ -16,8 +16,9 @@ import michael.PunchLiteDemo.service.AuthService;
 
 
 /**
- * Handle user authentication
- * -controllers Convert RequestDTOs into response DTOs
+ * Handle user authentication using JWT
+ * -Login
+ * -Register
  * 
  */
 

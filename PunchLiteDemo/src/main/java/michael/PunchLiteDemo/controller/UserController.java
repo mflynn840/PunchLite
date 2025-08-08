@@ -1,11 +1,14 @@
 package michael.PunchLiteDemo.controller;
 
+import michael.PunchLiteDemo.dto.UserDto;
 import michael.PunchLiteDemo.dto.UserUpdateRequest;
 import michael.PunchLiteDemo.model.User;
 import michael.PunchLiteDemo.service.UserService;
 
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /** 
@@ -32,14 +35,15 @@ public class UserController {
     //-------EXPOSES REST API HERE-----
     //GET /api/users
     @GetMapping("")
-    public List<User> getAllUsers(){
-        return this.userService.listUsers();
+    public ResponseEntity<List<User>> getAllUsers(){
+        return ResponseEntity.ok(this.userService.listUsers());
     }
 
     //PUT /api/users/id
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable("id") Long userId, @RequestBody UserUpdateRequest updateInfo){
-        return this.userService.updateUser(userId, updateInfo);
+    public ResponseEntity<UserDto> updateUser(@PathVariable("id") Long userId, @RequestBody UserUpdateRequest updateInfo){
+        User updatedU = this.userService.updateUser(userId, updateInfo);
+        return ResponseEntity.ok(new UserDto(updatedU));
     }
 
     //DELETE /api/users/id
@@ -48,10 +52,13 @@ public class UserController {
         this.userService.deleteUser(userId);
     } 
 
-    //GET /api/user/id
-    @GetMapping("/{id}")
-    public User getUserById(@PathVariable("id") Long userId){
-        return this.userService.getUserById(userId);
+
+    @GetMapping("/clock-status/{username}")
+    public ResponseEntity<Map<String,Boolean>> isClockedIn(@PathVariable("username") String username){
+        Boolean clockedIn = this.userService.isClockedIn(username);
+        //Add it to a JSON
+        Map<String, Boolean> response = Map.of("clockedIn", clockedIn);
+        return ResponseEntity.ok(response);
     }
 
 }

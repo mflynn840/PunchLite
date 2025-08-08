@@ -1,15 +1,79 @@
-import React from "react";
+import {useState} from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {useParams} from "react-router-dom";
+import logoImg from '../assets/logo.png'
+import Clock from '../components/Clock';
+
+import {useClockInStatus} from "../hooks/useClockInStatus";
+import {ClockInStatus} from "../components/ClockInStatus";
+import TimeEntryTable from "../components/TimeEntryTable";
+
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 
 export default function Dashboard() {
+
+  //get username from the url
   const {username} = useParams();
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const isClockedIn = useClockInStatus(username, refreshTrigger);
+
+
+  const handleClockIn = async(e) => {
+    e.preventDefault(); //prevent the page from reloading
+    
+    //try sending a POST request to the backend to clock in
+    try{
+      const response = await fetch(`${API_BASE}/api/time-entries/employees/${username}/clock-in`,
+      {
+        method: "POST",
+        headers : {
+          "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      //handle backend returning errors
+      if(!response.ok) throw new Error("Failed to clock in");
+
+      //trigger the hook to update the displayed clock in status
+      setRefreshTrigger(prev => prev+1);
+
+    }catch(error){
+      console.error("Failed to clock in", error.message);
+    }
+  };
+
+  const handleClockOut = async(e) => {
+    e.preventDefault(); //prevent the page from reloading
+    
+    //try sending a POST request to the backend to clock out
+    try{
+      const response = await fetch(`${API_BASE}/api/time-entries/employees/${username}/clock-out`,
+      {
+        method: "POST",
+        headers : {
+          "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json"
+        }
+      });
+      if (!response.ok) throw new Error("Error: failed to clock out");
+
+      //update clock in status and time entry table
+      setRefreshTrigger(prev => prev+1);
+
+
+    }catch(error){
+      console.error("Failed to clock out", error.message);
+    }
+  };
+  
 
   return (
     <div className="d-flex flex-column vh-100">
       {/* Top Navigation Bar */}
       <header className="bg-secondary text-white px-4 py-2">
-        <h5 className="mb-0">Time Clock - Page Specific Actions</h5>
+        <h5 className="mb-0">PunchLite User Dashboard</h5>
       </header>
 
       {/* Main content area */}
@@ -17,17 +81,22 @@ export default function Dashboard() {
         {/* Sidebar */}
         <aside className="bg-primary text-white p-3" style={{ width: "250px" }}>
           {/* Logo */}
-          <div className="bg-dark text-center py-3 mb-4">
-            <h4 className="mb-0">LOGO</h4>
+          <div className="text-center mb-4">
+            <img
+              src={logoImg}
+              alt="Logo Image"
+              style={{ width: '100%', height: 'auto' }}
+            />
           </div>
+
 
           {/* Navigation Buttons */}
           <div className="d-grid gap-2">
-            <button className="btn btn-outline-light">Clock In</button>
-            <button className="btn btn-outline-light">Clock Out</button>
-            <button className="btn btn-outline-light">My Time Entries</button>
+            <button className="btn btn-outline-light" onClick={handleClockIn}>Clock In</button>
+            <button className="btn btn-outline-light" onClick={handleClockOut}>Clock Out</button>
+            <button className="btn btn-outline-light">View Pay</button>
             <button className="btn btn-outline-light">Reports</button>
-            <button className="btn btn-outline-light">Settings</button>
+            <button className="btn btn-outline-light">Edit Account</button>
           </div>
         </aside>
 
@@ -35,7 +104,16 @@ export default function Dashboard() {
         <main className="flex-grow-1 p-5">
           <h3>Welcome, {username}</h3>
           <p className="lead">This is your time clock dashboard. Use the menu to manage your hours.</p>
+          <Clock />
+          <div className="mt-4">
+            <ClockInStatus isClockedIn={isClockedIn} />
+          </div>
+
+          <div className="mt-4">
+            <TimeEntryTable username={username} refreshTrigger={refreshTrigger} />
+          </div>
         </main>
+        
       </div>
     </div>
   );

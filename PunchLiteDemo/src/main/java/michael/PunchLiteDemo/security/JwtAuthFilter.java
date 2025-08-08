@@ -51,22 +51,32 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
+        //get the JWT token from the authorization header
         try{
             final String jwt = authHeader.substring(7);
             final String username = jwtUtil.getUsername(jwt);
             
+            //Get the current authentication from the security context
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             
-            if (username != null && authentication != null) {
+            // Only authenticate if
+            //  1. The username was succesfully extracted from the token
+            //  2. The current request is not already authenticated
+            if (username != null && authentication == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
+
+                //validate the JWT token
                 if (this.jwtUtil.isTokenValid(jwt, userDetails)) {
+                    //create an authentication object for the user
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
                         userDetails.getAuthorities()
                     );                 
-                    //set the authentication in the security context
+
+                    //set the users authentication in spring security context
+                    // Allow the user to access their endpoints (restricted behind login)
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }

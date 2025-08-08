@@ -2,6 +2,7 @@ package michael.PunchLiteDemo.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -22,15 +23,19 @@ public class TimeEntryService {
         this.userRepo = userRepo;
     }
 
-    public List<TimeEntry> getTimeEntriesByUser(Long userId){
-        return this.timeEntryRepo.findByUserId(userId);
+    public List<TimeEntry> getTimeEntriesByUser(String username, int limit){
+        List<TimeEntry> allEntries = this.timeEntryRepo.findByUserUsernameOrderByClockInDesc(username);
+        return allEntries.stream()
+                        .limit(limit)
+                        .collect(Collectors.toList());
+
     }
 
-    public TimeEntry handleClockIn(Long userId){
+    public TimeEntry handleClockIn(String username){
 
         //get the user
-        User u = this.userRepo.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        TimeEntry latestEntry = this.timeEntryRepo.findTopByUserIdOrderByClockInDesc(userId);
+        User u = this.userRepo.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        TimeEntry latestEntry = this.timeEntryRepo.findTopByUser_UsernameOrderByClockInDesc(username);
 
         //if the employees is already clocked in
         if(latestEntry != null && latestEntry.getClockOut() == null){
@@ -43,9 +48,9 @@ public class TimeEntryService {
 
     }
 
-    public TimeEntry handleClockOut(Long userId){
+    public TimeEntry handleClockOut(String username){
 
-        TimeEntry latestEntry = this.timeEntryRepo.findTopByUserIdOrderByClockInDesc(userId);
+        TimeEntry latestEntry = this.timeEntryRepo.findTopByUser_UsernameOrderByClockInDesc(username);
         //if the employee is not clocked in
         if(latestEntry == null || latestEntry.getClockOut() != null){
             throw new IllegalStateException("Error: employee is not clocked in");

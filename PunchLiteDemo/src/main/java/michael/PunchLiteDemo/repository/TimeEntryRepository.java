@@ -11,5 +11,7 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, Long>{
     List<TimeEntry> findByClockInAfterAndUser(LocalDateTime clockIn, User user);
     List<TimeEntry> findByClockInBetweenAndUser(LocalDateTime start, LocalDateTime end, User user);
     TimeEntry findTopByUserIdOrderByClockInDesc(Long userId);
+    TimeEntry findTopByUser_UsernameOrderByClockInDesc(String username);
+    List<TimeEntry> findByUserUsernameOrderByClockInDesc(String username);
 }
 
