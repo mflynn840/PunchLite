@@ -1,6 +1,5 @@
 package michael.PunchLiteDemo.controller;
 
-import org.springframework.aot.hint.annotation.RegisterReflection;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
