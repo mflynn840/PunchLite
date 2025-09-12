@@ -1,5 +1,6 @@
 package michael.PunchLiteDemo.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class User implements UserDetails {
     private Double hourlyRate;
     
     @Enumerated(EnumType.STRING)
+    @Column(nullable=false)
     private Role role; 
 
     //Relationship between employees and managers
@@ -64,6 +66,24 @@ public class User implements UserDetails {
 
     public String getPassword(){return this.password;}
     public void setPassword(String password){this.password = password;}
+
+    public List<User> getSubordinates(){return this.subordinates;}
+    public void setSubordinates(List<User> subordinates){this.subordinates = subordinates;}
+    public void addSubordinate(User subordinate){
+        if(this.subordinates == null){
+            this.subordinates = new ArrayList<User>();
+        }
+        this.subordinates.add(subordinate);
+    
+    }
+    public void removeSubordinate(User subordinate) {
+    if (this.subordinates != null) {
+        this.subordinates.remove(subordinate);
+        subordinate.setManager(null);
+    }
+}
+    public User getManager(){return this.manager;}
+    public void setManager(User manager){this.manager=manager;}
 
     //return a list of the users privledges
     @Override

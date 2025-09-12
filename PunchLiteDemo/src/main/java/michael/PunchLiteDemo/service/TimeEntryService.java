@@ -35,15 +35,20 @@ public class TimeEntryService {
     public TimeEntry handleClockIn(String username){
 
         //get the user
-        User u = this.userRepo.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User employee = this.userRepo.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("User not found"));
         TimeEntry latestEntry = this.timeEntryRepo.findTopByUser_UsernameOrderByClockInDesc(username);
 
+        //if the employees wage is not set
+        if(employee.getHourlyRate() == null){
+            throw new IllegalStateException("Employees wage is not set");
+        }
         //if the employees is already clocked in
         if(latestEntry != null && latestEntry.getClockOut() == null){
-            throw new IllegalStateException("Error: employee is already clocked in");
+            throw new IllegalStateException("Employee is already clocked in");
         }
+
         TimeEntry newPunch = new TimeEntry();
-        newPunch.setUser(u);
+        newPunch.setUser(employee);
         newPunch.setClockIn(LocalDateTime.now());
         return this.timeEntryRepo.save(newPunch);
 
@@ -54,7 +59,7 @@ public class TimeEntryService {
         TimeEntry latestEntry = this.timeEntryRepo.findTopByUser_UsernameOrderByClockInDesc(username);
         //if the employee is not clocked in
         if(latestEntry == null || latestEntry.getClockOut() != null){
-            throw new IllegalStateException("Error: employee is not clocked in");
+            throw new IllegalArgumentException("Invalid clock out");
         }
 
         LocalDateTime clockIn = latestEntry.getClockIn();

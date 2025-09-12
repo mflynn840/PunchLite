@@ -11,7 +11,9 @@ import {useLogout} from "../hooks/useLogout";
 import Sidebar from "../components/Sidebar";
 import ClockScreen from "../components/ClockScreen";
 import ViewPay from "./ViewPay";
-import ManageEmployees from "./ManageEmployees"
+import ManageEmployees from "./ManageEmployees";
+import ManageManagers from "./ManageManagers";
+
 
 //import the backends ip address
 const API_BASE = import.meta.env.VITE_API_BASE;
@@ -55,6 +57,7 @@ export default function Dashboard() {
           onViewPay={() => setActivePage("pay")}
           onLogout={logout}
           onManageEmployees={() => setActivePage("manage-employees")}
+          onManageManagers={() => setActivePage("manage-managers")}
           role = {storedUser?.role}
         />
 
@@ -81,6 +84,14 @@ export default function Dashboard() {
           {/* show manage employees dashboard */}
           {activePage === 'manage-employees' && (
             <ManageEmployees
+              username={username}
+              refreshTrigger={refreshTrigger}
+            />
+          )}
+          
+          {/* Show manage managers dashboard*/}
+          {activePage === 'manage-managers' && (
+            <ManageManagers
               username={username}
               refreshTrigger={refreshTrigger}
             />

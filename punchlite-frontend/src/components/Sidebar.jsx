@@ -6,7 +6,7 @@ import logoImg from '../assets/logo.png';
  * 
  * @Params handlers for the four buttons
  */
-export default function Sidebar({onClockIn, onClockOut, onViewPay, onLogout, onManageEmployees, role}){
+export default function Sidebar({onClockIn, onClockOut, onViewPay, onLogout, onManageEmployees, onManageManagers, role}){
     return(<aside className="bg-primary text-white p-3" style={{ width: "250px" }}>
           {/* Logo */}
           <div className="text-center mb-4">
@@ -25,7 +25,12 @@ export default function Sidebar({onClockIn, onClockOut, onViewPay, onLogout, onM
 
             {/* Only render the manage-employees button for managers */}
             {role.includes("MANAGER") && (
-              <button className="btn btn-outline-light" onClick={onManageEmployees}> Manage Employees</button>
+              <button className="btn btn-outline-light" onClick={onManageEmployees}>Manage Employees</button>
+            )}
+
+            {/* Only render manage-managers button for admins */}
+            {role.includes("ADMIN") && (
+              <button className="btn btn-outline-light" onClick={onManageManagers}>Manage Managers</button>
             )}
 
             <button className="btn btn-outline-light" onClick={onLogout}>Logout</button>

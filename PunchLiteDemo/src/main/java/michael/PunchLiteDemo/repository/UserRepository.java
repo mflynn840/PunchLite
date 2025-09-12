@@ -1,5 +1,6 @@
 package michael.PunchLiteDemo.repository;
 
+import michael.PunchLiteDemo.model.Role;
 import michael.PunchLiteDemo.model.User;
 
 import java.util.List;
@@ -14,5 +15,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String userName);
     boolean existsByIdAndManagerId(Long userId, Long managerId);
     Optional<List<User>> findByManagerUsername(String managerUsername);
+    Optional<List<User>> findByRole(Role role);
 }
 

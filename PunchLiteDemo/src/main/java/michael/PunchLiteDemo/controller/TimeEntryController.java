@@ -3,6 +3,7 @@ package michael.PunchLiteDemo.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,16 +50,35 @@ public class TimeEntryController {
     }
 
 
+    /**
+     * Clock a user in if it is a valid operation (i.e)
+     *  -the user is not already clocked in
+     *  -the user's wage field has been instantiated
+     */
     @PostMapping("/employees/{username}/clock-in")
-    public ResponseEntity<TimeEntryDto> clockIn(@PathVariable("username") String username){
-        TimeEntry res = this.timeEntryService.handleClockIn(username);
-        return ResponseEntity.ok(new TimeEntryDto(res));
+    public ResponseEntity<?> clockIn(@PathVariable("username") String username){
+
+        try{
+            TimeEntry res = this.timeEntryService.handleClockIn(username);
+            return ResponseEntity.ok(new TimeEntryDto(res));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
+
+
+
     @PostMapping("/employees/{username}/clock-out")
-    public ResponseEntity<TimeEntryDto> clockOut(@PathVariable("username") String username){
-        TimeEntry res = this.timeEntryService.handleClockOut(username);
-        return ResponseEntity.ok(new TimeEntryDto(res));
+    public ResponseEntity<?> clockOut(@PathVariable("username") String username){
+        try{
+            TimeEntry res = this.timeEntryService.handleClockOut(username);
+            return ResponseEntity.ok(new TimeEntryDto(res));
+        }catch(IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }  
 
     /**

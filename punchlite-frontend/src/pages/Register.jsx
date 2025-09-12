@@ -117,6 +117,7 @@ function Register() {
             <option value="" disabled> Select role </option>
             <option value="EMPLOYEE">Employee</option>
             <option value="MANAGER">Manager</option>
+            <option value="ADMIN">Admin</option>
 
           </select>
           <br />

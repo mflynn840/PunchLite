@@ -43,13 +43,16 @@ function EmployeeTable({username, refreshTrigger}){
 
     return (
     <table border="1" style={{ borderCollapse: "collapse", width: "100%" }}>
+
       <thead>
         <tr>
           <th>Username</th>
           <th>Action</th>
         </tr>
       </thead>
+
       <tbody>
+        {/* Map each employee to a cell with username and a cell with manage button */}
         {employees.map((emp) => (
           <tr key={emp.id}>
             <td>{emp.username}</td>
@@ -60,6 +63,7 @@ function EmployeeTable({username, refreshTrigger}){
             </td>
           </tr>
         ))}
+
       </tbody>
     </table>
   );

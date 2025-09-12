@@ -1,12 +1,16 @@
 package michael.PunchLiteDemo.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import michael.PunchLiteDemo.dto.AssignManagerRequest;
+import michael.PunchLiteDemo.dto.SetWageRequest;
 import michael.PunchLiteDemo.dto.UserUpdateRequest;
+import michael.PunchLiteDemo.model.Role;
 import michael.PunchLiteDemo.model.TimeEntry;
 import michael.PunchLiteDemo.model.User;
 import michael.PunchLiteDemo.repository.TimeEntryRepository;
@@ -70,5 +74,49 @@ public class UserService {
         List<User> managedUsers = this.userRepo.findByManagerUsername(managerUsername)
                                     .orElseThrow(() -> new IllegalStateException("No users managed"));
         return managedUsers;
+    }
+
+    public void assignEmployeeToManager(AssignManagerRequest request) {
+        User subordinate = this.userRepo.findByUsername(request.getUserUsername())
+                                    .orElseThrow(() -> new IllegalArgumentException("User does not exist"));
+
+        //make sure the user is not already assigned to a manager
+        if(subordinate.getManager() != null){throw new IllegalStateException("user already has a manager");}
+
+
+        User manager = this.userRepo.findByUsername(request.getManagerUsername())
+                                .orElseThrow(() -> new IllegalArgumentException("Manager not found"));
+
+        manager.addSubordinate(subordinate);
+        subordinate.setManager(manager);
+    }
+
+
+    public void setWage(SetWageRequest request){
+
+        //get the employee and requesting manager if they exist
+        User employee = this.userRepo.findByUsername(request.getEmployeeUsername())
+                                .orElseThrow(() -> new IllegalArgumentException());
+        User manager = this.userRepo.findByUsername(request.getEmployeeUsername())
+                                .orElseThrow(() -> new IllegalArgumentException());
+        
+        if(!manager.getSubordinates().contains(employee)){
+            throw new IllegalStateException("Failed: This manager does not manage the employee");
+        }
+
+        employee.setHourlyRate(request.getNewHourlyRate());
+        this.userRepo.save(employee);
+
+    }
+
+    public List<User> listEmployees() {
+        return this.userRepo.findByRole(Role.EMPLOYEE)
+            .orElse(new ArrayList<>());
+
+    }
+
+    public List<User> listManagers() {
+        return this.userRepo.findByRole(Role.MANAGER)
+                .orElse(new ArrayList<>());
     }
 }

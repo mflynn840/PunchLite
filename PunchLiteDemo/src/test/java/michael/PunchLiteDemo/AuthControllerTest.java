@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.MediaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import michael.PunchLiteDemo.model.Role;
 import michael.PunchLiteDemo.model.User;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,13 +54,15 @@ public class AuthControllerTest {
      * -@Rollback deletes the random user after test
      * 
      */
-    @Test
-    public void registerUser_ShouldReturnOk_WhenValidDataProvided() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value=Role.class, names={"EMPLOYEE", "MANAGER", "ADMIN"})
+    public void registerUser_withRole_ShouldReturnOk(Role role) throws Exception {
 
         //generate a random user
         User user = new User();
         user.setUsername("testuser" + System.currentTimeMillis());
         user.setPassword("password");
+        user.setRole(role);
 
         //register the user
         mockMvc.perform(post("/api/auth/register")
