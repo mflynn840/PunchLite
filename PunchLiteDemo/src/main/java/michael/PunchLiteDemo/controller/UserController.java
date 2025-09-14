@@ -114,6 +114,22 @@ public class UserController {
         }
     }
 
+    /**
+     * Update user hourly rate by user ID with manager security check
+     */
+    @PreAuthorize("hasRole('MANAGER')")
+    @PutMapping("/{id}/hourly-rate")
+    public ResponseEntity<?> updateHourlyRate(@PathVariable("id") Long userId, @RequestBody SetWageRequest request){
+        try{
+            this.userService.updateHourlyRate(userId, request);
+            return ResponseEntity.ok(new ApiResponse("Hourly rate updated successfully"));
+        }catch(IllegalStateException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch(IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     /** Convert a list of users to a list of userDTOs */
     public List<UserDto> wrapUsers(List<User> users){
         return users.stream().map(UserDto::new).toList();

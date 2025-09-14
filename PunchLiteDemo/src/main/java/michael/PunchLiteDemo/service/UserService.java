@@ -119,4 +119,32 @@ public class UserService {
         return this.userRepo.findByRole(Role.MANAGER)
                 .orElse(new ArrayList<>());
     }
+
+    public void updateHourlyRate(Long userId, SetWageRequest request) {
+        // Get the employee to be updated
+        User employee = this.userRepo.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("Employee not found"));
+        
+        // Get the manager making the request
+        User manager = this.userRepo.findByUsername(request.getManagerUsername())
+                .orElseThrow(() -> new IllegalStateException("Manager not found"));
+        
+        // Security check: Verify that the manager actually manages this employee
+        if (!manager.getSubordinates().contains(employee)) {
+            throw new IllegalStateException("Access denied: You can only update wages for employees you manage");
+        }
+        
+        // Validate the new hourly rate
+        Double newHourlyRate = request.getNewHourlyRate();
+        if (newHourlyRate == null) {
+            throw new IllegalArgumentException("Hourly rate is required");
+        }
+        if (newHourlyRate < 0) {
+            throw new IllegalArgumentException("Hourly rate cannot be negative");
+        }
+        
+        // Update the employee's hourly rate
+        employee.setHourlyRate(newHourlyRate);
+        this.userRepo.save(employee);
+    }
 }

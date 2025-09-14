@@ -1,71 +1,78 @@
 import React, {useEffect, useState} from "react";
+import {useEmployeeTable} from "../hooks/useEmployeeTable";
+import SalaryManagementPopup from "./SalaryManagementPopup";
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 
 function EmployeeTable({username, refreshTrigger}){
     
-    //define variables
-    const [employees, setEmployees] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  // State for salary management popup
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
 
-    useEffect(() => {
-        if(!username) return;
-        
-        //async try to fetch the 5 most recent punches for user from the backend
-        async function fetchEmployees() {
-            try{
-                //Use bearer token to access the employees backend api
-                const response = await fetch(`${API_BASE}/api/users/managed-by/${username}`,{
-                    method : 'GET',
-                    headers : {
-                        'Authorization' : `Bearer ${localStorage.getItem("token")}`,
-                        'Content-Type' : "application/json" 
-                    }
-                });
-                if(!response.ok) throw new Error("Failed to get managed users");
+  //Use a hook to connect with the backend
+  const { employees, loading, error} = useEmployeeTable(username, refreshTrigger);
 
-                const data = await response.json();
-                setEmployees(data);
+  // Handler for opening the salary management popup
+  const handleManageClick = (employee) => {
+    setSelectedEmployee(employee);
+    setIsPopupOpen(true);
+  };
 
-            }catch(error){
-                setError(error.message);
-            }finally {
-                setLoading(false);
-            }
-        }
-        //call function on creation, and when username/refresh trigger are updated
-        fetchEmployees();
-    }, [username, refreshTrigger]);
+  // Handler for closing the popup
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+    setSelectedEmployee(null);
+  };
 
-    if (loading) return <p>Loading Employees for {username}...</p>;
-    if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
+  // Handler for successful salary update
+  const handleSalaryUpdateSuccess = () => {
+    // The refreshTrigger will cause the employee table to refresh
+    // No need to do anything else here
+  };
 
-    return (
-    <table border="1" style={{ borderCollapse: "collapse", width: "100%" }}>
+  if(loading) return <p>Loading Employees for {username}...</p>
+  if(error) return <p>Error: failed to fetch </p>
 
-      <thead>
-        <tr>
-          <th>Username</th>
-          <th>Action</th>
-        </tr>
-      </thead>
+  //render an employee table
+  return (
+    <>
+      <table border="1" style={{ borderCollapse: "collapse", width: "100%" }}>
 
-      <tbody>
-        {/* Map each employee to a cell with username and a cell with manage button */}
-        {employees.map((emp) => (
-          <tr key={emp.id}>
-            <td>{emp.username}</td>
-            <td>
-              <button onClick={() => alert(`Manage ${emp.username}`)}>
-                Manage
-              </button>
-            </td>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Hourly Rate</th>
+            <th>Action</th>
           </tr>
-        ))}
+        </thead>
 
-      </tbody>
-    </table>
+        <tbody>
+          {employees.length === 0 ? (
+            <tr><td colSpan={3}>No Employees Found</td></tr>
+          ): (
+            employees.map((emp) => (
+            <tr key={emp.id}>
+              <td>{emp.username}</td>
+              <td>${emp.hourlyRate ? emp.hourlyRate.toFixed(2) : '0.00'}</td>
+              <td>
+                <button onClick={() => handleManageClick(emp)}>Manage</button>
+                </td>
+              </tr>
+            ))
+          )}
+
+        </tbody>
+      </table>
+
+      <SalaryManagementPopup
+        isOpen={isPopupOpen}
+        onClose={handleClosePopup}
+        employee={selectedEmployee}
+        managerUsername={username}
+        onSuccess={handleSalaryUpdateSuccess}
+      />
+    </>
   );
 }
 export default EmployeeTable;

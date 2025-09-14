@@ -28,13 +28,16 @@ public class User implements UserDetails {
     private String password;
     private Double hourlyRate;
     
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TimeEntry> timeEntries = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private Role role; 
 
     //Relationship between employees and managers
-    @OneToMany(mappedBy = "manager")
-    private List<User> subordinates;
+    @OneToMany(mappedBy = "manager", cascade=CascadeType.ALL, orphanRemoval = true)
+    private List<User> subordinates = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "manager_id")
@@ -65,14 +68,21 @@ public class User implements UserDetails {
     public void setHourlyRate(Double hourlyRate){this.hourlyRate = hourlyRate;}
 
     public String getPassword(){return this.password;}
-    public void setPassword(String password){this.password = password;}
+    public void setPassword(String password){
+        this.password = password;
+    }
 
     public List<User> getSubordinates(){return this.subordinates;}
     public void setSubordinates(List<User> subordinates){this.subordinates = subordinates;}
+
+    public List<TimeEntry> getTimeEntries(){return this.timeEntries;}
+    public void setTimeEntries(List<TimeEntry> timeEntries){this.timeEntries=timeEntries;}
+
+
+    public void addTimeEntry(TimeEntry t){
+        this.timeEntries.add(t);
+    }
     public void addSubordinate(User subordinate){
-        if(this.subordinates == null){
-            this.subordinates = new ArrayList<User>();
-        }
         this.subordinates.add(subordinate);
     
     }
