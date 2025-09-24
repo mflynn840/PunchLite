@@ -24,9 +24,11 @@ Roles (each level has all of the privledges of the previous plus the additional)
 
 Synthetic demo data populating script:
     -./PunchLite-backend/src.main.java/michael/PunchLiteDemo/config/GenerateDummyDb.java
+    -Create an admin (admin)
     -Create 2 managers (manager0 and manager1)
     -Create 20 employees (with names employee1...employee20) where half are managed by each manager
         -Each worker gets 10 time entries (reasonably randomly generated, picked within the last 2 weeks)
         -half of the time entires need to be approved still
+    -Everyones password is password, the UI changes depending on role
         
     
