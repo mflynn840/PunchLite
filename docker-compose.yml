@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: PunchLite-backend/springBackend.dockerfile  # Path to your backend Dockerfile
+    container_name: spring-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    networks:
+      - my-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: PunchLite-frontend/reactFrontend.dockerfile  # Path to your frontend Dockerfile
+    container_name: react-frontend
+    ports:
+      - "80:80"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
