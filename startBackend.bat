@@ -1,4 +1,4 @@
 @echo off
 cd /d "%~dp0"
-cd ./PunchLiteDemo
+cd ./PunchLite-backend
 start cmd /k "mvn spring-boot:run"

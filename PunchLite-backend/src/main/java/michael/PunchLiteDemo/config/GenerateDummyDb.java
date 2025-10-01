@@ -1,17 +1,16 @@
 package michael.PunchLiteDemo.config;
+
+
 import michael.PunchLiteDemo.model.Role;
 import michael.PunchLiteDemo.model.TimeEntry;
 import michael.PunchLiteDemo.model.User;
 import michael.PunchLiteDemo.repository.TimeEntryRepository;
 import michael.PunchLiteDemo.repository.UserRepository;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Random;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
 import jakarta.transaction.Transactional;
 /**
  * 
@@ -20,11 +19,8 @@ import jakarta.transaction.Transactional;
  *      Generate 20 employees (username, password, email, wage, permissionSet.USER)
  *      Generate 2 managers (username, password, email, wage, permissionSet.MANAGER)
  *      Generate 1 admin (username, password, email, wage, permissionSet.ADMIN)
- * 
- *      For each employee, manager and admin generate 10 time entries (5 approved, 5 unapproved)
- *         
- *      
- * 
+ *          For each employee, manager and admin generate 10 time entries (5 approved, 5 unapproved)
+
  */
 @Component
 public class GenerateDummyDb {
